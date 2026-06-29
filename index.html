@@ -30,7 +30,7 @@
       <!-- Sección de Importación / Selección -->
       <section id="import-section" class="card">
         <div class="import-header">
-          <h2>Importar Set de Lego</h2>
+          <h2>Tus Sets de Lego</h2>
           <button id="btn-toggle-config" class="btn btn-icon" title="Configurar API Key">⚙️ Configuración</button>
         </div>
 
@@ -43,6 +43,17 @@
             <button id="btn-save-key" class="btn btn-success">Guardar</button>
           </div>
           <hr class="panel-hr">
+        </div>
+
+        <!-- Selector de Sets Guardados (Visible si hay sets) -->
+        <div id="saved-sets-wrapper" class="saved-sets-wrapper" style="display: none;">
+          <p class="info-text"><strong>Cargar set guardado:</strong> Selecciona una lista para empezar a contar:</p>
+          <div class="set-selector-container">
+            <select id="set-selector" class="set-selector">
+              <!-- Se rellenará dinámicamente -->
+            </select>
+          </div>
+          <div class="divider"><span>ó cargar nuevo set</span></div>
         </div>
         
         <!-- Importación por API de Rebrickable (Recomendado) -->
@@ -88,13 +99,6 @@
             <button id="btn-reset-set" class="btn btn-warning-outline btn-sm">Reiniciar</button>
             <button id="btn-delete-set" class="btn btn-danger btn-sm">Eliminar Set</button>
           </div>
-        </div>
-
-        <!-- Desplegable para alternar entre sets cargados -->
-        <div class="set-selector-wrapper">
-          <select id="set-selector" class="set-selector">
-            <!-- Se rellenará dinámicamente -->
-          </select>
         </div>
 
         <div class="stats-grid">

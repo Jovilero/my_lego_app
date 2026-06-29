@@ -81,6 +81,7 @@ const elements = {
 
   // Gestión Multi-Set
   setSelector: document.getElementById('set-selector'),
+  savedSetsWrapper: document.getElementById('saved-sets-wrapper'),
   btnDeleteSet: document.getElementById('btn-delete-set')
 };
 
@@ -91,7 +92,8 @@ let rebrickableApiKey = '';
 document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
   loadApiKey();
-  loadActiveSetFromStorage();
+  // Rellenar el selector al iniciar, pero mantener la app vacía por defecto
+  updateSetSelector();
   registerServiceWorker();
 });
 
@@ -139,21 +141,26 @@ function parseRebrickableHTML(htmlText, filename) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlText, 'text/html');
     
+    // Buscar filas de la tabla de piezas
+    const rows = doc.querySelectorAll('table tbody tr');
+    if (rows.length === 0) {
+      // Verificar si hay indicios de bloqueo de seguridad / Cloudflare
+      const textLower = htmlText.toLowerCase();
+      if (textLower.includes('cloudflare') || textLower.includes('captcha') || textLower.includes('attention required') || textLower.includes('security check')) {
+        alert('Error de Seguridad (Cloudflare):\n\nRebrickable está bloqueando la descarga automatizada de esta página.\n\nPor favor, utiliza la opción "Descarga directa por API" (configurando tu API Key gratis) o sube el archivo HTML guardado localmente desde tu PC.');
+      } else {
+        alert('No se encontraron piezas en el archivo HTML. Asegúrate de que es una exportación de Rebrickable válida.');
+      }
+      return;
+    }
+
     // Obtener título del set
     let setTitleText = 'Set Importado';
     const titleElement = doc.querySelector('title');
     if (titleElement && titleElement.textContent) {
       setTitleText = titleElement.textContent.trim().replace(/^Parts\s*-\s*/i, '');
     } else {
-      // Fallback usando el nombre del archivo
       setTitleText = filename.replace(/\.html$/i, '').replace(/^Parts\s*-\s*/i, '');
-    }
-
-    // Buscar filas de la tabla de piezas
-    const rows = doc.querySelectorAll('table tbody tr');
-    if (rows.length === 0) {
-      alert('No se encontraron piezas en el archivo HTML. Asegúrate de que es una exportación de Rebrickable válida.');
-      return;
     }
 
     const parsedParts = [];
@@ -166,7 +173,6 @@ function parseRebrickableHTML(htmlText, filename) {
       const imgElement = cells[0].querySelector('img');
       let imageUrl = '';
       if (imgElement) {
-        // data-src suele ser la imagen real en rebrickable (con lazy load)
         const rawUrl = imgElement.getAttribute('data-src') || imgElement.getAttribute('src') || '';
         imageUrl = validateAndSanitizeUrl(rawUrl);
       }
@@ -590,18 +596,28 @@ function handleUrlImport() {
   fetch(proxyUrl)
     .then(response => {
       if (!response.ok) {
-        throw new Error('Error en la respuesta de red al conectar al proxy.');
+        throw new Error(`Error en el servidor proxy (status: ${response.status})`);
       }
       return response.text();
     })
     .then(htmlText => {
+      // Verificar si la respuesta devuelta por el proxy es vacía o tiene Cloudflare
+      const textLower = htmlText.toLowerCase();
+      if (!htmlText || textLower.includes('cloudflare') || textLower.includes('captcha') || textLower.includes('security check')) {
+        throw new Error('Bloqueo de seguridad de Rebrickable (Cloudflare)');
+      }
+      
       // Procesar el HTML descargado
       parseRebrickableHTML(htmlText, 'Set desde Enlace');
       elements.rebrickableUrlInput.value = ''; // Limpiar campo
     })
     .catch(error => {
       console.error('Error al importar desde la URL:', error);
-      alert('No se pudo descargar la lista de piezas. Verifica tu conexión a internet o la URL introducida.');
+      if (error.message.includes('Cloudflare')) {
+        alert('Error de Seguridad (Cloudflare):\n\nRebrickable ha bloqueado la descarga del HTML. Cloudflare impide las peticiones automatizadas de webs externas.\n\nPor favor, usa la "Descarga directa por API" (configurando tu API Key gratis) o sube el archivo HTML guardado en tu PC.');
+      } else {
+        alert('No se pudo descargar la lista de piezas. Verifica tu conexión a internet o la URL introducida.');
+      }
     })
     .finally(() => {
       // Restaurar estado del botón
@@ -787,15 +803,23 @@ function updateSetSelector() {
   selector.innerHTML = '';
   
   const savedSets = getSavedSetsList();
+  
+  // Si no hay sets guardados, ocultar el contenedor por completo
   if (savedSets.length === 0) {
-    const option = document.createElement('option');
-    option.textContent = 'Sin sets importados';
-    selector.appendChild(option);
-    selector.disabled = true;
+    elements.savedSetsWrapper.style.display = 'none';
     return;
   }
   
-  selector.disabled = false;
+  // Si hay sets, mostrar el contenedor del selector
+  elements.savedSetsWrapper.style.display = 'block';
+  
+  // Añadir opción vacía de selección por defecto
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = '— Selecciona un set guardado —';
+  defaultOption.selected = (!currentSet.id);
+  selector.appendChild(defaultOption);
+  
   savedSets.forEach(set => {
     const option = document.createElement('option');
     option.value = set.id;
@@ -810,7 +834,13 @@ function updateSetSelector() {
 
 function handleSetChange(event) {
   const selectedId = event.target.value;
-  if (!selectedId) return;
+  if (!selectedId) {
+    // Si selecciona la opción vacía, limpiar el estado activo y mostrar pantalla vacía
+    localStorage.removeItem('lego_active_set_id');
+    currentSet = { id: '', title: '', parts: [] };
+    updateUI();
+    return;
+  }
   loadActiveSetFromStorage(selectedId);
 }
 
@@ -821,18 +851,14 @@ function deleteCurrentSet() {
   
   if (confirm(confirmMsg)) {
     localStorage.removeItem(`lego_set_${currentSet.id}`);
+    localStorage.removeItem('lego_active_set_id');
     
-    // Buscar si queda algún otro set guardado
-    const savedSets = getSavedSetsList();
-    if (savedSets.length > 0) {
-      // Cargar el primer set disponible
-      loadActiveSetFromStorage(savedSets[0].id);
-    } else {
-      // No quedan sets, vaciar todo
-      localStorage.removeItem('lego_active_set_id');
-      currentSet = { id: '', title: '', parts: [] };
-      updateUI();
-    }
+    // Limpiar estado
+    currentSet = { id: '', title: '', parts: [] };
+    
+    // Actualizar selector y UI
+    updateSetSelector();
+    updateUI();
     
     alert('Set eliminado correctamente.');
   }
