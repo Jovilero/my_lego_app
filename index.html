@@ -30,13 +30,29 @@
       <!-- Sección de Importación / Selección -->
       <section id="import-section" class="card">
         <h2>Importar Lista de Piezas</h2>
-        <p class="info-text">Sube el archivo HTML exportado de Rebrickable para empezar.</p>
-        <div class="file-upload-wrapper">
-          <label for="html-file-input" class="btn btn-primary btn-upload">
-            <span class="icon-upload"></span> Seleccionar archivo HTML
-          </label>
-          <input type="file" id="html-file-input" accept=".html" style="display: none;">
-          <span id="file-name-display" class="file-name-text">Ningún archivo seleccionado</span>
+        
+        <!-- Importación por URL -->
+        <div class="url-import-wrapper">
+          <p class="info-text">Introduce el enlace de la tabla de piezas de Rebrickable:</p>
+          <div class="input-group">
+            <input type="url" id="rebrickable-url-input" placeholder="https://rebrickable.com/inventory/..." class="search-input">
+            <button id="btn-import-url" class="btn btn-primary">Importar Enlace</button>
+          </div>
+          <p class="info-text-sm">Ejemplo: https://rebrickable.com/inventory/12725/parts/?format=table</p>
+        </div>
+
+        <div class="divider"><span>ó</span></div>
+
+        <!-- Importación por Archivo Local -->
+        <div class="file-import-wrapper">
+          <p class="info-text">Sube el archivo HTML descargado de Rebrickable:</p>
+          <div class="file-upload-wrapper">
+            <label for="html-file-input" class="btn btn-primary-outline btn-upload">
+              <span class="icon-upload"></span> Seleccionar archivo HTML
+            </label>
+            <input type="file" id="html-file-input" accept=".html" style="display: none;">
+            <span id="file-name-display" class="file-name-text">Ningún archivo seleccionado</span>
+          </div>
         </div>
       </section>
 

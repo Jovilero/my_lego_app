@@ -65,7 +65,11 @@ const elements = {
   
   // Filtros
   searchInput: document.getElementById('search-input'),
-  filterSelect: document.getElementById('filter-select')
+  filterSelect: document.getElementById('filter-select'),
+  
+  // Importación por URL
+  rebrickableUrlInput: document.getElementById('rebrickable-url-input'),
+  btnImportUrl: document.getElementById('btn-import-url')
 };
 
 // 3. Inicialización y Event Listeners
@@ -78,6 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
 function setupEventListeners() {
   // Carga de archivo
   elements.fileInput.addEventListener('change', handleFileSelect);
+  
+  // Importación por URL
+  elements.btnImportUrl.addEventListener('click', handleUrlImport);
   
   // Controles de filtros
   elements.searchInput.addEventListener('input', renderPartsList);
@@ -345,6 +352,8 @@ function renderPartsList() {
   filteredParts.forEach(part => {
     const card = document.createElement('div');
     card.className = 'part-item-card';
+    card.setAttribute('data-id', part.id); // Identificador único para actualizaciones del DOM
+    
     if (part.have === part.quantity) {
       card.classList.add('completed');
     }
@@ -412,7 +421,8 @@ function renderPartsList() {
     counterStats.className = 'counter-stats';
     
     const missingCount = Math.max(0, part.quantity - part.have);
-    counterStats.innerHTML = `Tengo: <strong>${part.have}</strong> / ${part.quantity}<br>Faltan: <strong>${missingCount}</strong>`;
+    // Usamos spans con clases para poder actualizarlos de manera selectiva sin redibujar
+    counterStats.innerHTML = `Tengo: <strong class="val-have">${part.have}</strong> / ${part.quantity}<br>Faltan: <strong class="val-missing">${missingCount}</strong>`;
     counterSection.appendChild(counterStats);
 
     const counterControls = document.createElement('div');
@@ -468,9 +478,77 @@ function updatePartQuantity(partId, change) {
     saveSetToStorage();
     calculateStatsAndProgress();
     
-    // Volver a renderizar la lista manteniendo el estado visual
-    renderPartsList();
+    // Actualización selectiva del DOM para evitar perder la posición del scroll
+    const cardElement = document.querySelector(`[data-id="${partId}"]`);
+    if (cardElement) {
+      // 1. Actualizar valores en el bloque de estadísticas de la tarjeta
+      const valHaveSpan = cardElement.querySelector('.val-have');
+      const valMissingSpan = cardElement.querySelector('.val-missing');
+      const counterValueSpan = cardElement.querySelector('.counter-value');
+      
+      if (valHaveSpan) valHaveSpan.textContent = part.have;
+      if (valMissingSpan) valMissingSpan.textContent = Math.max(0, part.quantity - part.have);
+      if (counterValueSpan) counterValueSpan.textContent = part.have;
+      
+      // 2. Actualizar estado visual de completado
+      if (part.have === part.quantity) {
+        cardElement.classList.add('completed');
+      } else {
+        cardElement.classList.remove('completed');
+      }
+    }
   }
+}
+
+// 8. Importación por URL desde Rebrickable usando un proxy CORS seguro (allorigins)
+function handleUrlImport() {
+  const urlInput = elements.rebrickableUrlInput.value.trim();
+  if (!urlInput) {
+    alert('Por favor, introduce una URL válida de Rebrickable.');
+    return;
+  }
+
+  // Validar que sea un dominio de Rebrickable
+  try {
+    const parsedUrl = new URL(urlInput);
+    if (!parsedUrl.hostname.includes('rebrickable.com')) {
+      alert('La URL debe ser del dominio rebrickable.com');
+      return;
+    }
+  } catch (e) {
+    alert('Introduce una URL válida completa (ej: https://rebrickable.com/...)');
+    return;
+  }
+
+  // Cambiar estado del botón para feedback visual
+  const originalText = elements.btnImportUrl.textContent;
+  elements.btnImportUrl.textContent = 'Importando...';
+  elements.btnImportUrl.disabled = true;
+
+  // Usar el proxy CORS público y gratuito allorigins para descargar el HTML crudo
+  const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(urlInput)}`;
+
+  fetch(proxyUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error en la respuesta de red al conectar al proxy.');
+      }
+      return response.text();
+    })
+    .then(htmlText => {
+      // Procesar el HTML descargado
+      parseRebrickableHTML(htmlText, 'Set desde Enlace');
+      elements.rebrickableUrlInput.value = ''; // Limpiar campo
+    })
+    .catch(error => {
+      console.error('Error al importar desde la URL:', error);
+      alert('No se pudo descargar la lista de piezas. Verifica tu conexión a internet o la URL introducida.');
+    })
+    .finally(() => {
+      // Restaurar estado del botón
+      elements.btnImportUrl.textContent = originalText;
+      elements.btnImportUrl.disabled = false;
+    });
 }
 
 function registerServiceWorker() {
