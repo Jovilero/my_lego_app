@@ -23,3 +23,33 @@
 - **Configuración de Seguridad (OWASP A05:2021)**: Content Security Policy (CSP) estricta implementada vía etiqueta `<meta>`.
 - **Validación de Recursos**: Las URLs de imágenes extraídas del HTML son validadas contra una lista blanca (`cdn.rebrickable.com`, `rebrickable.com`) antes de asignarse a las etiquetas `<img>`.
 - **Integridad de Datos**: Los datos en IndexedDB se sanitizan para ajustarse estrictamente al esquema esperado, mitigando riesgos de inyección de propiedades u objetos maliciosos.
+
+---
+
+## 4. Estado Actual y Progreso (29 de junio de 2026)
+
+### ✅ Fase 0 (Prueba de Concepto - PoC) - COMPLETADA
+- Diseñada la interfaz táctil premium optimizada para el Samsung A54 en [index.html](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/index.html) y [css/styles.css](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/css/styles.css).
+- Implementado el parser seguro y la lógica de contadores en [js/app.js](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/js/app.js).
+- Creado el [manifest.json](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/manifest.json) y el logo vectorial en [img/logo.svg](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/img/logo.svg).
+- Implementado el Service Worker nativo [sw.js](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/sw.js) para soporte offline.
+- Creado el repositorio en GitHub ([github.com/Jovilero/my_lego_app](https://github.com/Jovilero/my_lego_app)) y desplegado con éxito en **GitHub Pages** ([jovilero.github.io/my_lego_app](https://jovilero.github.io/my_lego_app/)).
+- **Hito**: El usuario ha instalado con éxito la PWA en su teléfono Samsung A54 a través de la conexión HTTPS segura de GitHub Pages.
+
+---
+
+## 5. Siguientes Pasos (Próxima Sesión)
+
+### 1. Feedback de Usabilidad
+- Esperar el feedback del usuario tras probar la PoC en su móvil con el set de ejemplo para ajustar el tamaño de los botones de contadores, transiciones, colores o comportamiento de la lista de piezas.
+
+### 2. Implementar la Persistencia Definitiva (IndexedDB)
+- Desarrollar `js/db.js` para reemplazar `localStorage` por `IndexedDB`.
+- Esto permitirá gestionar múltiples sets, almacenar miles de piezas de forma eficiente y evitar el límite de 5MB de `localStorage`.
+
+### 3. Refinamiento de Caché Offline
+- Verificar y optimizar el comportamiento del almacenamiento en caché del Service Worker para garantizar la disponibilidad del 100% de las imágenes de las piezas en el sótano de la tienda (modo 100% offline).
+
+### 4. Suite de Tests Automatizados y de Seguridad
+- Crear [tests/index.html](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/tests/index.html) y [tests/tests.js](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/tests/tests.js) para ejecutar pruebas unitarias en el navegador.
+- Implementar los tests de ciberseguridad (XSS con payloads maliciosos, validación de dominios de imágenes, directivas CSP).
