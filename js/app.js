@@ -67,9 +67,9 @@ const elements = {
   searchInput: document.getElementById('search-input'),
   filterSelect: document.getElementById('filter-select'),
   
-  // Importación por URL
-  rebrickableUrlInput: document.getElementById('rebrickable-url-input'),
-  btnImportUrl: document.getElementById('btn-import-url'),
+  // Importación por URL (Comentado temporalmente)
+  // rebrickableUrlInput: document.getElementById('rebrickable-url-input'),
+  // btnImportUrl: document.getElementById('btn-import-url'),
 
   // Importación por API
   btnToggleConfig: document.getElementById('btn-toggle-config'),
@@ -101,8 +101,8 @@ function setupEventListeners() {
   // Carga de archivo
   elements.fileInput.addEventListener('change', handleFileSelect);
   
-  // Importación por URL
-  elements.btnImportUrl.addEventListener('click', handleUrlImport);
+  // Importación por URL (Comentado temporalmente)
+  // elements.btnImportUrl.addEventListener('click', handleUrlImport);
 
   // Importación por API y Configuración
   elements.btnToggleConfig.addEventListener('click', toggleConfigPanel);
