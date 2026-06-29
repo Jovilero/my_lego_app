@@ -418,6 +418,7 @@ function renderPartsList() {
       const img = document.createElement('img');
       img.className = 'part-img';
       img.alt = part.description;
+      img.setAttribute('loading', 'lazy'); // Carga perezosa para evitar error 429 (Too Many Requests) en el CDN
       // Asignar src (ya fue validado por validateAndSanitizeUrl al importar)
       img.src = part.imageUrl;
       // Fallback si la imagen no carga
@@ -718,7 +719,12 @@ async function handleApiImport() {
     
   } catch (error) {
     console.error('Error al descargar set por API:', error);
-    alert(`Error: ${error.message}. Verifica el número del set y tu API Key.`);
+    let errorMsg = error.message;
+    // Si el set no existe y no tiene guión, sugerir el sufijo de versión (-1)
+    if (error.message.includes('no existe') && !setNum.includes('-')) {
+      errorMsg += `.\n\nSugerencia: Rebrickable requiere el número de versión. Intenta buscando "${setNum}-1" en lugar de "${setNum}".`;
+    }
+    alert(`Error: ${errorMsg}`);
   } finally {
     elements.btnImportApi.textContent = originalText;
     elements.btnImportApi.disabled = false;
