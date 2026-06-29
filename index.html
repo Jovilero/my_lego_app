@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Lego Parts Tracker</title>
+  
+  <!-- Content Security Policy Estricta -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https://cdn.rebrickable.com https://rebrickable.com; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://cdn.rebrickable.com https://rebrickable.com;">
+  
+  <!-- Manifest para PWA -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-logo">
+        <span class="logo-brick"></span>
+        <h1>Lego Parts</h1>
+      </div>
+      <p class="header-subtitle">Tu inventario offline de piezas</p>
+    </header>
+
+    <main class="app-main">
+      <!-- Sección de Importación / Selección -->
+      <section id="import-section" class="card">
+        <h2>Importar Lista de Piezas</h2>
+        <p class="info-text">Sube el archivo HTML exportado de Rebrickable para empezar.</p>
+        <div class="file-upload-wrapper">
+          <label for="html-file-input" class="btn btn-primary btn-upload">
+            <span class="icon-upload"></span> Seleccionar archivo HTML
+          </label>
+          <input type="file" id="html-file-input" accept=".html" style="display: none;">
+          <span id="file-name-display" class="file-name-text">Ningún archivo seleccionado</span>
+        </div>
+      </section>
+
+      <!-- Panel de Estadísticas y Control (Oculto inicialmente) -->
+      <section id="stats-section" class="card stats-card" style="display: none;">
+        <div class="stats-header">
+          <h2 id="set-title">Nombre del Set</h2>
+          <button id="btn-reset-set" class="btn btn-danger-outline btn-sm">Reiniciar Set</button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <span class="stat-value" id="stat-total-parts">0</span>
+            <span class="stat-label">Total Piezas</span>
+          </div>
+          <div class="stat-box accent-green">
+            <span class="stat-value" id="stat-owned-parts">0</span>
+            <span class="stat-label">Tengo</span>
+          </div>
+          <div class="stat-box accent-blue">
+            <span class="stat-value" id="stat-missing-parts">0</span>
+            <span class="stat-label">Faltan</span>
+          </div>
+          <div class="stat-box accent-purple">
+            <span class="stat-value" id="stat-progress-percent">0%</span>
+            <span class="stat-label">Progreso</span>
+          </div>
+        </div>
+        
+        <div class="progress-bar-container">
+          <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%;"></div>
+        </div>
+
+        <div class="filter-controls">
+          <input type="text" id="search-input" placeholder="Buscar por descripción o número..." class="search-input">
+          <select id="filter-select" class="filter-select">
+            <option value="all">Todas las piezas</option>
+            <option value="missing">Faltantes</option>
+            <option value="completed">Completadas</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- Listado de Piezas -->
+      <section id="parts-list-section" class="parts-list-container">
+        <!-- Las piezas se inyectarán dinámicamente aquí -->
+        <div id="empty-state" class="empty-state">
+          <div class="empty-state-icon">🧩</div>
+          <h3>No hay piezas cargadas</h3>
+          <p>Importa un archivo HTML de Rebrickable para visualizar y contar tus piezas.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>&copy; 2026 Lego Parts Tracker — Modo Local Seguro</p>
+    </footer>
+  </div>
+
+  <script src="./js/app.js"></script>
+</body>
+</html>

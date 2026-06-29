@@ -1,0 +1,33 @@
+# Directorios y archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs y Editores
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Archivos de credenciales y sensibles (OWASP / Directrices)
+.env
+.keys
+.credentials
+arxv_DB.txt
+
+# Python (por si se usan entornos virtuales o cache en subcarpetas)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+ENV/
+.pytest_cache/
+
+# Cachés locales de navegadores y pruebas
+.lighthouse/
+*.log

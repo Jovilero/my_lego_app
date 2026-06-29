@@ -1,0 +1,498 @@
+/* Lego Parts Tracker - Estilos Premium (Vanilla CSS) */
+
+/* 1. Reset & Variables de Sistema */
+:root {
+  --bg-main: hsl(224, 71%, 4%);
+  --bg-card: rgba(15, 23, 42, 0.6);
+  --border-color: rgba(255, 255, 255, 0.08);
+  
+  /* Paleta de colores */
+  --text-primary: hsl(210, 40%, 98%);
+  --text-secondary: hsl(215, 20%, 65%);
+  --accent-purple: hsl(263, 84%, 60%);
+  --accent-blue: hsl(199, 89%, 48%);
+  --accent-green: hsl(142, 72%, 40%);
+  --accent-red: hsl(0, 72%, 50%);
+  
+  /* Gradientes */
+  --grad-accent: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+  --grad-card-border: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%);
+  
+  /* Sombras y desenfoque */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.5);
+  --glass-blur: blur(16px);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent; /* Evita destello al pulsar en móvil */
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+  padding-bottom: 2rem;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(14, 165, 233, 0.05) 0%, transparent 40%);
+  background-attachment: fixed;
+}
+
+/* 2. Layout & Estructura */
+.app-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem 0;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.logo-brick {
+  width: 28px;
+  height: 20px;
+  background: var(--grad-accent);
+  border-radius: 4px;
+  position: relative;
+}
+
+.logo-brick::before, .logo-brick::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  width: 6px;
+  height: 4px;
+  background: var(--accent-purple);
+  border-radius: 2px 2px 0 0;
+}
+.logo-brick::before { left: 5px; }
+.logo-brick::after { right: 5px; }
+
+.app-header h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: var(--grad-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.header-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* 3. Componente Tarjeta (Glassmorphism) */
+.card {
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-md);
+}
+
+.card h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.2px;
+}
+
+.info-text {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+/* 4. Botones & Controles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--grad-accent);
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2);
+}
+
+.btn-danger-outline {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: hsl(0, 84%, 70%);
+}
+
+.btn-danger-outline:active {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  border-radius: 8px;
+}
+
+.file-upload-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: border-color 0.2s ease;
+}
+
+.file-upload-wrapper:hover, .file-upload-wrapper:focus-within {
+  border-color: var(--accent-blue);
+}
+
+.file-name-text {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  word-break: break-all;
+  text-align: center;
+}
+
+/* 5. Sección de Estadísticas */
+.stats-card {
+  border-left: 4px solid var(--accent-purple);
+}
+
+.stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.stats-header h2 {
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0.15rem;
+}
+
+.accent-green .stat-value { color: var(--accent-green); }
+.accent-blue .stat-value { color: var(--accent-blue); }
+.accent-purple .stat-value { color: var(--accent-purple); }
+
+.progress-bar-container {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--grad-accent);
+  border-radius: 3px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Filtros y Buscador */
+.filter-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  color: white;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: var(--accent-purple);
+}
+
+.filter-select {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.6rem;
+  color: white;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+/* 6. Listado de Piezas & Tarjetas de Piezas */
+.parts-list-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+@media (min-width: 480px) {
+  .parts-list-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.part-item-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.part-item-card.completed {
+  border-color: rgba(34, 197, 94, 0.3);
+  background: rgba(20, 83, 45, 0.15);
+}
+
+.part-item-card.completed::after {
+  content: '✓';
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  color: var(--accent-green);
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+/* Imagen de la pieza */
+.part-img-wrapper {
+  width: 70px;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.part-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.part-img-fallback {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+}
+
+/* Detalles de la pieza */
+.part-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0; /* Permite truncado de texto */
+  justify-content: space-between;
+}
+
+.part-desc {
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.part-meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.meta-num {
+  font-family: monospace;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+}
+
+.meta-color {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Indicador visual de color */
+.color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: inline-block;
+}
+
+/* Controles del Contador */
+.part-counter-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  gap: 0.5rem;
+}
+
+.counter-stats {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.counter-stats strong {
+  color: var(--text-primary);
+}
+
+.counter-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-counter {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-color);
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+/* Aumentamos el área de pulsación táctil (touch target) */
+@media (max-width: 600px) {
+  .btn-counter {
+    width: 38px;
+    height: 38px;
+    font-size: 1.2rem;
+  }
+}
+
+.btn-counter:active {
+  transform: scale(0.9);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.counter-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* 7. Estados Vacíos y de Carga */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  font-size: 0.85rem;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.app-footer {
+  text-align: center;
+  margin-top: 3rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
