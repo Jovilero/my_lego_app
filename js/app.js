@@ -77,7 +77,11 @@ const elements = {
   apiKeyInput: document.getElementById('api-key-input'),
   btnSaveKey: document.getElementById('btn-save-key'),
   setNumberInput: document.getElementById('set-number-input'),
-  btnImportApi: document.getElementById('btn-import-api')
+  btnImportApi: document.getElementById('btn-import-api'),
+
+  // Gestión Multi-Set
+  setSelector: document.getElementById('set-selector'),
+  btnDeleteSet: document.getElementById('btn-delete-set')
 };
 
 // Variable para almacenar la API Key en memoria activa
@@ -102,6 +106,10 @@ function setupEventListeners() {
   elements.btnToggleConfig.addEventListener('click', toggleConfigPanel);
   elements.btnSaveKey.addEventListener('click', saveApiKey);
   elements.btnImportApi.addEventListener('click', handleApiImport);
+
+  // Selección y gestión de sets
+  elements.setSelector.addEventListener('change', handleSetChange);
+  elements.btnDeleteSet.addEventListener('click', deleteCurrentSet);
   
   // Controles de filtros
   elements.searchInput.addEventListener('input', renderPartsList);
@@ -190,8 +198,14 @@ function parseRebrickableHTML(htmlText, filename) {
       parts: parsedParts
     };
 
-    // Si ya existía este set en localStorage, recuperar el progreso ("have")
-    restoreProgressFromStorage();
+    // Si ya existía este set en localStorage, preguntar si se desea conservar o sobreescribir
+    if (localStorage.getItem(`lego_set_${currentSet.id}`)) {
+      if (!confirm('Este set ya se encuentra importado. ¿Deseas sobreescribirlo y reiniciar todo el progreso?')) {
+        // Cargar el set que ya existía en lugar del nuevo
+        loadActiveSetFromStorage(currentSet.id);
+        return;
+      }
+    }
     
     // Guardar en Storage
     saveSetToStorage();
@@ -234,13 +248,22 @@ function saveSetToStorage() {
   localStorage.setItem('lego_active_set_id', currentSet.id);
 }
 
-function loadActiveSetFromStorage() {
-  const activeId = localStorage.getItem('lego_active_set_id');
-  if (!activeId) return;
+function loadActiveSetFromStorage(forceId = null) {
+  const activeId = forceId || localStorage.getItem('lego_active_set_id');
+  if (!activeId) {
+    updateUI(); // Asegura mostrar estado vacío si no hay sets
+    return;
+  }
 
   const setData = localStorage.getItem(`lego_set_${activeId}`);
   if (setData) {
     currentSet = JSON.parse(setData);
+    localStorage.setItem('lego_active_set_id', currentSet.id);
+    updateUI();
+  } else {
+    // Si la clave no existe, limpiar el ID activo y actualizar UI
+    localStorage.removeItem('lego_active_set_id');
+    currentSet = { id: '', title: '', parts: [] };
     updateUI();
   }
 }
@@ -284,15 +307,21 @@ function updateUI() {
     elements.importSection.style.display = 'block';
     elements.statsSection.style.display = 'none';
     elements.emptyState.style.display = 'block';
+    // Limpiar listado
+    while (elements.partsListSection.firstChild) {
+      elements.partsListSection.removeChild(elements.partsListSection.firstChild);
+    }
+    elements.partsListSection.appendChild(elements.emptyState);
     return;
   }
 
   elements.setTitle.textContent = currentSet.title;
-  elements.importSection.style.display = 'block'; // Permitir importar otro set encima
+  elements.importSection.style.display = 'block';
   elements.statsSection.style.display = 'block';
   elements.emptyState.style.display = 'none';
 
   calculateStatsAndProgress();
+  updateSetSelector(); // Actualizar el desplegable
   renderPartsList();
 }
 
@@ -515,6 +544,18 @@ function updatePartQuantity(partId, change) {
         cardElement.classList.remove('completed');
       }
     }
+
+    // 3. Actualizar el texto del set activo en el selector superior en tiempo real
+    const activeOption = elements.setSelector.querySelector(`option[value="${currentSet.id}"]`);
+    if (activeOption) {
+      let total = 0;
+      let owned = 0;
+      currentSet.parts.forEach(p => {
+        total += p.quantity;
+        owned += p.have;
+      });
+      activeOption.textContent = `${currentSet.title} — ${owned}/${total}`;
+    }
   }
 }
 
@@ -615,6 +656,16 @@ async function handleApiImport() {
 
   try {
     const result = await fetchSetFromRebrickable(setNum, rebrickableApiKey);
+
+    // Si ya existe en local, preguntar sobreescritura
+    const targetId = encodeURIComponent(result.title);
+    if (localStorage.getItem(`lego_set_${targetId}`)) {
+      if (!confirm('Este set ya se encuentra importado. ¿Deseas sobreescribirlo y reiniciar todo el progreso?')) {
+        loadActiveSetFromStorage(targetId);
+        elements.setNumberInput.value = '';
+        return;
+      }
+    }
     
     // Mapear los resultados de la API a nuestro formato interno
     const parsedParts = result.parts.map((item, index) => {
@@ -638,13 +689,12 @@ async function handleApiImport() {
 
     // Guardar en el estado del set activo
     currentSet = {
-      id: encodeURIComponent(result.title),
+      id: targetId,
       title: result.title,
       parts: parsedParts
     };
 
-    // Restaurar progreso y guardar
-    restoreProgressFromStorage();
+    // Guardar
     saveSetToStorage();
     updateUI();
     
@@ -696,6 +746,96 @@ async function fetchSetFromRebrickable(setNum, apiKey) {
     title: setTitleText,
     parts: parts
   };
+}
+
+// 10. Gestión de Múltiples Listas e Intercambio
+function getSavedSetsList() {
+  const sets = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    // Filtrar claves de sets de Lego
+    if (key.startsWith('lego_set_') && key !== 'lego_set_list') {
+      try {
+        const setData = JSON.parse(localStorage.getItem(key));
+        if (setData && setData.title) {
+          // Calcular estadísticas para el nombre en el desplegable
+          let total = 0;
+          let owned = 0;
+          setData.parts.forEach(p => {
+            total += p.quantity;
+            owned += p.have;
+          });
+          sets.push({
+            id: setData.id,
+            title: setData.title,
+            total: total,
+            owned: owned
+          });
+        }
+      } catch (e) {
+        console.error('Error al parsear set guardado:', e);
+      }
+    }
+  }
+  
+  // Ordenar alfabéticamente por título
+  return sets.sort((a, b) => a.title.localeCompare(b.title));
+}
+
+function updateSetSelector() {
+  const selector = elements.setSelector;
+  selector.innerHTML = '';
+  
+  const savedSets = getSavedSetsList();
+  if (savedSets.length === 0) {
+    const option = document.createElement('option');
+    option.textContent = 'Sin sets importados';
+    selector.appendChild(option);
+    selector.disabled = true;
+    return;
+  }
+  
+  selector.disabled = false;
+  savedSets.forEach(set => {
+    const option = document.createElement('option');
+    option.value = set.id;
+    // Formato: "Número del set - piezastengo/piezastotales"
+    option.textContent = `${set.title} — ${set.owned}/${set.total}`;
+    if (set.id === currentSet.id) {
+      option.selected = true;
+    }
+    selector.appendChild(option);
+  });
+}
+
+function handleSetChange(event) {
+  const selectedId = event.target.value;
+  if (!selectedId) return;
+  loadActiveSetFromStorage(selectedId);
+}
+
+function deleteCurrentSet() {
+  if (!currentSet.id) return;
+  
+  const confirmMsg = `¿Seguro que quieres eliminar el set "${currentSet.title}" de forma permanente?\n\nEsta acción borrará todo tu progreso.`;
+  
+  if (confirm(confirmMsg)) {
+    localStorage.removeItem(`lego_set_${currentSet.id}`);
+    
+    // Buscar si queda algún otro set guardado
+    const savedSets = getSavedSetsList();
+    if (savedSets.length > 0) {
+      // Cargar el primer set disponible
+      loadActiveSetFromStorage(savedSets[0].id);
+    } else {
+      // No quedan sets, vaciar todo
+      localStorage.removeItem('lego_active_set_id');
+      currentSet = { id: '', title: '', parts: [] };
+      updateUI();
+    }
+    
+    alert('Set eliminado correctamente.');
+  }
 }
 
 function registerServiceWorker() {

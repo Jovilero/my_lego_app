@@ -84,8 +84,19 @@
       <section id="stats-section" class="card stats-card" style="display: none;">
         <div class="stats-header">
           <h2 id="set-title">Nombre del Set</h2>
-          <button id="btn-reset-set" class="btn btn-danger-outline btn-sm">Reiniciar Set</button>
+          <div class="stats-actions">
+            <button id="btn-reset-set" class="btn btn-warning-outline btn-sm">Reiniciar</button>
+            <button id="btn-delete-set" class="btn btn-danger btn-sm">Eliminar Set</button>
+          </div>
         </div>
+
+        <!-- Desplegable para alternar entre sets cargados -->
+        <div class="set-selector-wrapper">
+          <select id="set-selector" class="set-selector">
+            <!-- Se rellenará dinámicamente -->
+          </select>
+        </div>
+
         <div class="stats-grid">
           <div class="stat-box">
             <span class="stat-value" id="stat-total-parts">0</span>

@@ -621,4 +621,58 @@ body {
   width: 100%;
 }
 
+/* Estilos de Gestión Multi-Set */
+.stats-actions {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.set-selector-wrapper {
+  margin-bottom: 1.25rem;
+  width: 100%;
+}
+
+.set-selector {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s ease;
+}
+
+.set-selector:focus {
+  border-color: var(--accent-purple);
+}
+
+.btn-danger {
+  background: var(--accent-red);
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.btn-danger:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.1);
+}
+
+.btn-warning-outline {
+  background: transparent;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: hsl(38, 92%, 70%);
+}
+
+.btn-warning-outline:active {
+  background: rgba(245, 158, 11, 0.1);
+  transform: scale(0.97);
+}
+
+
 
