@@ -54,3 +54,12 @@
 ### 4. Suite de Tests Automatizados y de Seguridad
 - Crear [tests/index.html](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/tests/index.html) y [tests/tests.js](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/tests/tests.js) para ejecutar pruebas unitarias en el navegador.
 - Implementar los tests de ciberseguridad (XSS con payloads maliciosos, validación de dominios de imágenes, directivas CSP).
+
+---
+
+## 6. Futuras Mejoras / Backlog (Anotado para el futuro)
+- **Migración a App Nativa de Android (Kotlin + Jetpack Compose)**:
+  - Diseñar la app de forma nativa en Kotlin para Android.
+  - Usar la base de datos local **Room** (SQLite nativo) para el almacenamiento persistente de sets y piezas.
+  - Esto eliminará por completo las restricciones de CORS del navegador, permitiendo a la app descargar directamente los HTMLs y las imágenes desde los servidores de Rebrickable sin necesidad de proxies intermedios.
+  - Integrar la **API oficial de Rebrickable** usando la clave de API gratuita del usuario para permitir la búsqueda directa de sets por número dentro de la aplicación.
