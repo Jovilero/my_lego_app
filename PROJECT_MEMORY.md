@@ -28,13 +28,14 @@
 
 ## 4. Estado Actual y Progreso (29 de junio de 2026)
 
-### ✅ Fase 0 (Prueba de Concepto - PoC) - COMPLETADA
+### ✅ Fase 0 (Prueba de Concepto - PoC) - COMPLETADA & ITERADA
 - Diseñada la interfaz táctil premium optimizada para el Samsung A54 en [index.html](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/index.html) y [css/styles.css](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/css/styles.css).
 - Implementado el parser seguro y la lógica de contadores en [js/app.js](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/js/app.js).
+- **Iteración 1**: Corregido el bug del reinicio de scroll al actualizar contadores (+1/-1) mediante actualización selectiva de nodos en el DOM.
+- **Iteración 2**: Añadida la importación directa de listas de piezas pegando el enlace de Rebrickable (usando un proxy CORS de cliente seguro: `api.allorigins.win`).
 - Creado el [manifest.json](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/manifest.json) y el logo vectorial en [img/logo.svg](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/img/logo.svg).
 - Implementado el Service Worker nativo [sw.js](file:///a:/3-Ocio/4-Programacion/1-RepositoriosGIT/my_lego_app/sw.js) para soporte offline.
-- Creado el repositorio en GitHub ([github.com/Jovilero/my_lego_app](https://github.com/Jovilero/my_lego_app)) y desplegado con éxito en **GitHub Pages** ([jovilero.github.io/my_lego_app](https://jovilero.github.io/my_lego_app/)).
-- **Hito**: El usuario ha instalado con éxito la PWA en su teléfono Samsung A54 a través de la conexión HTTPS segura de GitHub Pages.
+- **Despliegue**: Sincronizado en GitHub ([github.com/Jovilero/my_lego_app](https://github.com/Jovilero/my_lego_app)) y publicado automáticamente con HTTPS en **GitHub Pages** ([jovilero.github.io/my_lego_app](https://jovilero.github.io/my_lego_app/)).
 
 ---
 
