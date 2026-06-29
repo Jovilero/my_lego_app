@@ -29,23 +29,47 @@
     <main class="app-main">
       <!-- Sección de Importación / Selección -->
       <section id="import-section" class="card">
-        <h2>Importar Lista de Piezas</h2>
+        <div class="import-header">
+          <h2>Importar Set de Lego</h2>
+          <button id="btn-toggle-config" class="btn btn-icon" title="Configurar API Key">⚙️ Configuración</button>
+        </div>
+
+        <!-- Panel de Configuración de API Key (Oculto por defecto) -->
+        <div id="config-panel" class="config-panel" style="display: none;">
+          <h3>Clave de API de Rebrickable</h3>
+          <p class="info-text-sm">Introduce tu API Key personal (consíguela gratis en tu perfil de Rebrickable).</p>
+          <div class="input-group">
+            <input type="password" id="api-key-input" placeholder="Tu API Key..." class="search-input">
+            <button id="btn-save-key" class="btn btn-success">Guardar</button>
+          </div>
+          <hr class="panel-hr">
+        </div>
+        
+        <!-- Importación por API de Rebrickable (Recomendado) -->
+        <div class="api-import-wrapper">
+          <p class="info-text"><strong>Descarga directa por API:</strong> Introduce el número del set (ej: 9497-1):</p>
+          <div class="input-group">
+            <input type="text" id="set-number-input" placeholder="Número de set (ej: 9497-1)" class="search-input">
+            <button id="btn-import-api" class="btn btn-primary">Descargar Set</button>
+          </div>
+        </div>
+
+        <div class="divider"><span>ó</span></div>
         
         <!-- Importación por URL -->
         <div class="url-import-wrapper">
-          <p class="info-text">Introduce el enlace de la tabla de piezas de Rebrickable:</p>
+          <p class="info-text"><strong>Importar desde enlace:</strong> Pega la URL de la tabla de piezas:</p>
           <div class="input-group">
             <input type="url" id="rebrickable-url-input" placeholder="https://rebrickable.com/inventory/..." class="search-input">
-            <button id="btn-import-url" class="btn btn-primary">Importar Enlace</button>
+            <button id="btn-import-url" class="btn btn-primary-outline">Importar Enlace</button>
           </div>
-          <p class="info-text-sm">Ejemplo: https://rebrickable.com/inventory/12725/parts/?format=table</p>
         </div>
 
         <div class="divider"><span>ó</span></div>
 
         <!-- Importación por Archivo Local -->
         <div class="file-import-wrapper">
-          <p class="info-text">Sube el archivo HTML descargado de Rebrickable:</p>
+          <p class="info-text"><strong>Importar archivo HTML:</strong> Sube el archivo descargado:</p>
           <div class="file-upload-wrapper">
             <label for="html-file-input" class="btn btn-primary-outline btn-upload">
               <span class="icon-upload"></span> Seleccionar archivo HTML

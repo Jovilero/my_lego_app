@@ -69,12 +69,24 @@ const elements = {
   
   // Importación por URL
   rebrickableUrlInput: document.getElementById('rebrickable-url-input'),
-  btnImportUrl: document.getElementById('btn-import-url')
+  btnImportUrl: document.getElementById('btn-import-url'),
+
+  // Importación por API
+  btnToggleConfig: document.getElementById('btn-toggle-config'),
+  configPanel: document.getElementById('config-panel'),
+  apiKeyInput: document.getElementById('api-key-input'),
+  btnSaveKey: document.getElementById('btn-save-key'),
+  setNumberInput: document.getElementById('set-number-input'),
+  btnImportApi: document.getElementById('btn-import-api')
 };
+
+// Variable para almacenar la API Key en memoria activa
+let rebrickableApiKey = '';
 
 // 3. Inicialización y Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
+  loadApiKey();
   loadActiveSetFromStorage();
   registerServiceWorker();
 });
@@ -85,6 +97,11 @@ function setupEventListeners() {
   
   // Importación por URL
   elements.btnImportUrl.addEventListener('click', handleUrlImport);
+
+  // Importación por API y Configuración
+  elements.btnToggleConfig.addEventListener('click', toggleConfigPanel);
+  elements.btnSaveKey.addEventListener('click', saveApiKey);
+  elements.btnImportApi.addEventListener('click', handleApiImport);
   
   // Controles de filtros
   elements.searchInput.addEventListener('input', renderPartsList);
@@ -404,7 +421,8 @@ function renderPartsList() {
     const colorDot = document.createElement('span');
     colorDot.className = 'color-dot';
     const colorKey = part.color.toLowerCase();
-    colorDot.style.backgroundColor = LEGO_COLORS[colorKey] || '#888888';
+    // Usamos el color hex exacto si fue provisto por la API, si no, el mapa de fallback
+    colorDot.style.backgroundColor = part.colorHex || LEGO_COLORS[colorKey] || '#888888';
     colorSpan.appendChild(colorDot);
 
     const colorText = document.createTextNode(` ${part.color}`);
@@ -549,6 +567,135 @@ function handleUrlImport() {
       elements.btnImportUrl.textContent = originalText;
       elements.btnImportUrl.disabled = false;
     });
+}
+
+// 9. Lógica de la API oficial de Rebrickable
+function loadApiKey() {
+  const savedKey = localStorage.getItem('rebrickable_api_key');
+  if (savedKey) {
+    rebrickableApiKey = savedKey;
+    elements.apiKeyInput.value = savedKey;
+  }
+}
+
+function toggleConfigPanel() {
+  const isHidden = elements.configPanel.style.display === 'none';
+  elements.configPanel.style.display = isHidden ? 'block' : 'none';
+}
+
+function saveApiKey() {
+  const key = elements.apiKeyInput.value.trim();
+  if (!key) {
+    alert('Introduce una clave válida.');
+    return;
+  }
+  
+  localStorage.setItem('rebrickable_api_key', key);
+  rebrickableApiKey = key;
+  alert('API Key guardada correctamente.');
+  elements.configPanel.style.display = 'none';
+}
+
+async function handleApiImport() {
+  const setNum = elements.setNumberInput.value.trim();
+  if (!setNum) {
+    alert('Introduce un número de set válido (ej: 9497-1).');
+    return;
+  }
+
+  if (!rebrickableApiKey) {
+    alert('Por favor, configura tu API Key de Rebrickable primero haciendo clic en el botón de Configuración ⚙️.');
+    elements.configPanel.style.display = 'block';
+    return;
+  }
+
+  const originalText = elements.btnImportApi.textContent;
+  elements.btnImportApi.textContent = 'Descargando...';
+  elements.btnImportApi.disabled = true;
+
+  try {
+    const result = await fetchSetFromRebrickable(setNum, rebrickableApiKey);
+    
+    // Mapear los resultados de la API a nuestro formato interno
+    const parsedParts = result.parts.map((item, index) => {
+      const part = item.part;
+      const color = item.color;
+      
+      const rawUrl = part.part_img_url || item.element_img_url || '';
+      const imageUrl = validateAndSanitizeUrl(rawUrl);
+
+      return {
+        id: `${part.part_num}_${color.name.replace(/\s+/g, '_')}_${index}`,
+        partNum: part.part_num,
+        quantity: item.quantity,
+        color: color.name,
+        colorHex: color.rgb ? `#${color.rgb}` : null, // Guardamos el color exacto
+        description: part.name,
+        imageUrl: imageUrl,
+        have: 0
+      };
+    });
+
+    // Guardar en el estado del set activo
+    currentSet = {
+      id: encodeURIComponent(result.title),
+      title: result.title,
+      parts: parsedParts
+    };
+
+    // Restaurar progreso y guardar
+    restoreProgressFromStorage();
+    saveSetToStorage();
+    updateUI();
+    
+    elements.setNumberInput.value = ''; // Limpiar input
+    
+  } catch (error) {
+    console.error('Error al descargar set por API:', error);
+    alert(`Error: ${error.message}. Verifica el número del set y tu API Key.`);
+  } finally {
+    elements.btnImportApi.textContent = originalText;
+    elements.btnImportApi.disabled = false;
+  }
+}
+
+async function fetchSetFromRebrickable(setNum, apiKey) {
+  const headers = { 'Authorization': `key ${apiKey}` };
+  
+  // 1. Obtener detalles del set para verificar existencia y obtener nombre
+  const setResponse = await fetch(`https://rebrickable.com/api/v3/lego/sets/${setNum}/`, { headers });
+  if (!setResponse.ok) {
+    if (setResponse.status === 401) {
+      throw new Error('API Key no válida o no autorizada');
+    }
+    if (setResponse.status === 404) {
+      throw new Error('El número de set no existe en Rebrickable');
+    }
+    throw new Error(`Error del servidor (${setResponse.status})`);
+  }
+  
+  const setData = await setResponse.json();
+  const setTitleText = `${setData.set_num} - ${setData.name}`;
+
+  // 2. Descargar lista completa de piezas gestionando la paginación automáticamente
+  let parts = [];
+  let nextUrl = `https://rebrickable.com/api/v3/lego/sets/${setNum}/parts/?page_size=100`;
+
+  while (nextUrl) {
+    const partsResponse = await fetch(nextUrl, { headers });
+    if (!partsResponse.ok) {
+      throw new Error('Error al descargar las piezas del set');
+    }
+    
+    const partsData = await partsResponse.json();
+    parts = parts.concat(partsData.results);
+    nextUrl = partsData.next; // URL de la siguiente página (o null si es la última)
+  }
+
+  return {
+    title: setTitleText,
+    parts: parts
+  };
 }
 
 function registerServiceWorker() {

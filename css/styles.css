@@ -560,3 +560,65 @@ body {
   background: rgba(139, 92, 246, 0.1);
 }
 
+/* Estilos de Configuración e Importación API */
+.import-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.import-header h2 {
+  margin-bottom: 0 !important;
+}
+
+.btn-icon {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  color: var(--text-secondary);
+}
+
+.btn-icon:active {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(0.95);
+}
+
+.config-panel {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.config-panel h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.btn-success {
+  background: var(--accent-green);
+  color: white;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+.btn-success:active {
+  transform: scale(0.97);
+}
+
+.panel-hr {
+  border: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin-top: 1rem;
+}
+
+.api-import-wrapper {
+  width: 100%;
+}
+
+
